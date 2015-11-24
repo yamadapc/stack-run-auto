@@ -46,6 +46,37 @@ This will:
 - Once we have all the dependencies, we pass them onto
   `stack runghc File.hs --package package1 --package package2 ...`
 
+## Example output
+```
+$ ./stack-run-auto Main.hs
+Parsing modules...
+Finding package for Control.Concurrent...
+----> base
+Finding package for Control.Distributed.Process...
+----> distributed-process
+Finding package for Control.Distributed.Process.Node...
+----> distributed-process
+Finding package for Network.Transport...
+----> network-transport
+Finding package for Network.Transport.TCP...
+----> network-transport-tcp
+Finding dependencies for base...
+Finding dependencies for distributed-process...
+----> distributed-process binary bytestring data-accessor distributed-static ghc-prim hashable mtl network-transport random rank1dynamic stm syb transformers
+Finding dependencies for network-transport...
+----> network-transport binary bytestring deepseq hashable transformers
+Finding dependencies for network-transport-tcp...
+----> network-transport-tcp bytestring containers data-accessor network network-transport
+Run from outside a project, using implicit global project config
+Using resolver: lts-3.5 from implicit global project's config file: /home/yamadapc/.stack/global/stack.yaml
+network-transport-0.4.2.0: download
+data-accessor-0.2.2.6: download
+network-transport-0.4.2.0: configure
+# ... Stack downloads and builds
+Completed all 6 actions.
+# ... Starts to run
+```
+
 - - -
 
 It'd be nice to have this polished. A couple of things:
