@@ -48,6 +48,7 @@ This will:
 
 ## Example output
 ```
+~ $ ./stack-run-auto DistributedProcess.hs
 $ file-modules DistributedProcess.hs
 ----> Control.Concurrent
 ----> Control.Distributed.Process
