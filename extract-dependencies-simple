@@ -1,0 +1,15 @@
+#!/bin/env node
+var cheerio = require('cheerio');
+var input = '';
+
+process.stdin.on('data', function(d) {
+  input += d;
+});
+
+process.stdin.on('close', function() {
+  var $ = cheerio.load(input);
+  $('td > #detailed-dependencies > ul > li > a').each(function(i, el) {
+    var href = $(el).attr('href');
+    console.log(href.replace('/package/', ''));
+  });
+});

@@ -1,0 +1,6 @@
+#!/bin/bash
+modules=`./file-modules $1`
+packages=`for module in $modules; do ./module-package $module; done | head -n 1`
+all_packages=`for package in $packages; do echo $package; ./hackage-dependencies $package; done`
+arg_list=`for package in $all_packages; do echo "--package $package"; done | sort | uniq`
+stack runghc $1 $arg_list

@@ -1,0 +1,4 @@
+#!/bin/bash
+curl -s -L http://hayoo.fh-wedel.de/json?query="module:$1" |
+jq -r '.result | map(select(.resultType == "module")) | .[].resultPackage' |
+uniq

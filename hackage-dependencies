@@ -1,0 +1,4 @@
+#!/bin/bash
+curl -s -L hackage.haskell.org/package/$1/dependencies |
+./extract-dependencies-simple |
+tail -n +2
