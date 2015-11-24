@@ -1,29 +1,37 @@
 #!/bin/bash
+set -e
+
 function errcho {
-  >&2 echo $@
+  >&2 echo "$@"
 }
 
 function package_for_module {
-  errcho "Finding package for $1..."
+  errcho "$ module-package $1"
   package=$(./module-package $1)
   errcho "----> $package"
   echo $package
 }
 
 function dependencies_for_package {
-  errcho "Finding dependencies for $1..."
   if [ $1 = "base" ]; then
     return
   fi
 
+  errcho "$ hackage-dependencies $1..."
   deps=$(echo $1; ./hackage-dependencies $1)
-  errcho "----> $deps"
+  for dep in $deps; do
+    errcho "----> $dep"
+  done
   echo $deps
 }
 
-errcho "Parsing modules..."
+errcho "$ file-modules $1"
 modules=`./file-modules $1`
+for module in $modules; do
+  errcho "----> $module"
+done
 packages=`for module in $modules; do package_for_module $module; done | sort | uniq`
 all_packages=`for package in $packages; do dependencies_for_package $package; done`
 arg_list=`for package in $all_packages; do echo "--package $package"; done | sort | uniq`
+errcho "$ stack runghc $1 `echo $arg_list`"
 stack runghc $1 $arg_list
