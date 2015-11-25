@@ -1,5 +1,8 @@
 stack-run-auto
 ==============
+_There's work going on the `dev` branch to remove dependencies and make this
+more efficient. Editor integration should come soon enough._
+- - -
 Automatically finds dependencies and runs a Haskell script (no cabal manifest,
 no stack.yaml, no project). Currently a proof-of-concept using scripts.
 
