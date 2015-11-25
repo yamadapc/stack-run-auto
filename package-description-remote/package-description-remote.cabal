@@ -1,8 +1,8 @@
 name:                package-description-remote
 version:             0.1.0.0
-synopsis:            Initial project template from stack
+synopsis:            Fetches a 'GenericPackageDescription' from Hackage
 description:         Please see README.md
-homepage:            http://github.com/yamadapc/package-description-remote#readme
+homepage:            http://github.com/yamadapc/stack-run-auto/package-description-remote
 license:             MIT
 license-file:        LICENSE
 author:              Pedro Tacla Yamada
@@ -34,4 +34,4 @@ test-suite package-description-remote-test
 
 source-repository head
   type:     git
-  location: https://github.com/yamadapc/package-description-remote
+  location: https://github.com/yamadapc/stack-run-auto
