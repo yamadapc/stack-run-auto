@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+function errcho {
+  >&2 echo "$@"
+}
+
+function dependencies_for_package {
+  if [ $1 = "base" ]; then
+    return
+  fi
+
+  errcho "$ hackage-dependencies $1..."
+  deps=$(echo $1; ./hackage-dependencies $1)
+  for dep in $deps; do
+    errcho "----> $dep"
+  done
+  echo $deps
+}
+
+packages=$@
+all_packages=`for package in $packages; do dependencies_for_package $package; done`
+arg_list=`for package in $all_packages; do echo "--package $package"; done | sort | uniq`
+errcho "$ stack ghci `echo $arg_list`"
+stack ghci $arg_list
