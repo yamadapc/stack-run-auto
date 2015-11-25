@@ -1,5 +1,6 @@
 resolver: lts-3.15
 packages:
 - '.'
+- '../package-description-remote'
 extra-deps: []
 extra-package-dbs: []
