@@ -1,17 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import qualified Data.ByteString.Lazy.Char8 as L
-import qualified Data.Text                  as T
-import           Text.HTML.DOM              (parseLBS)
-import           Text.XML.Cursor            (attribute, attributeIs, element,
-                                             fromDocument, ($//), (&/), (&|))
+import           Control.Lens       ((&), (.~), (^..))
+import           Data.Aeson.Lens    (key, values, _Integral)
+import           Network.Wreq
+import           System.Environment (getArgs)
+
+getLatestRevision :: String -> IO Integer
+getLatestRevision package =
+  maximum . (^.. responseBody . values . key "number" . _Integral) <$> getWith opt uri
+  where opt = defaults & header "Accept" .~ ["application/json"]
+        uri = "http://hackage.haskell.org/package/" ++ package ++ "/revisions/"
 
 main :: IO ()
-main =
-  (fromDocument . parseLBS) <$> L.getContents
-                            >>= (\cursor -> display $ cursor $// selector &| extract)
-  where selector = element "td" &/ attributeIs "id" "detailed-dependencies" &/
-                   element "ul" &/ element "li" &/ element "a"
-        extract = snd . T.breakOnEnd "/package/" . T.concat . attribute "href"
-        display = mapM_ (putStrLn . T.unpack)
+main = getArgs >>= getLatestRevision . head >>= print
