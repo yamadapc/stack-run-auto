@@ -1,27 +1,10 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
 import           Control.Concurrent.Async
 import           Control.Monad
-import qualified Data.Set                               as Set
-import           Distribution.Package
-import           Distribution.PackageDescription
-import           Distribution.PackageDescription.Parse
-import           Distribution.PackageDescription.Remote
+import qualified Data.Set                        as Set
+import           Development.ExtractDependencies
 import           System.Environment
-
-extractDependencies :: String -> IO [String]
-extractDependencies npkg = do
-    ppkg <- getPackageLatest npkg
-    case ppkg of
-        ParseOk _ info ->
-            case condLibrary info of
-                Just lib -> return $ dependencyName <$> condTreeConstraints lib
-                Nothing -> error "Package is not a library"
-        _ -> error "Failed to parse package description"
-  where
-    dependencyName (Dependency name _) = unPackageName name
 
 main :: IO ()
 main = do
