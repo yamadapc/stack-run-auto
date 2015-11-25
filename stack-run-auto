@@ -13,12 +13,12 @@ function package_for_module {
 }
 
 function dependencies_for_package {
-  if [ $1 = "base" ]; then
+  if [ $@ = "base" ]; then
     return
   fi
 
-  errcho "$ hackage-dependencies $1..."
-  deps=$(echo $1; ./hackage-dependencies $1)
+  errcho "$ extract-dependencies $@..."
+  deps=$(echo $@; extract-dependencies $@)
   for dep in $deps; do
     errcho "----> $dep"
   done
@@ -26,12 +26,12 @@ function dependencies_for_package {
 }
 
 errcho "$ file-modules $1"
-modules=`./file-modules $1`
+modules=`file-modules $1`
 for module in $modules; do
   errcho "----> $module"
 done
 packages=`for module in $modules; do package_for_module $module; done | sort | uniq`
-all_packages=`for package in $packages; do dependencies_for_package $package; done`
+all_packages=`dependencies_for_package $packages`
 arg_list=`for package in $all_packages; do echo "--package $package"; done | sort | uniq`
 errcho "$ stack runghc $1 `echo $arg_list`"
 stack runghc $1 $arg_list
