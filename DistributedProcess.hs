@@ -5,6 +5,7 @@ import Control.Distributed.Process
 import Control.Distributed.Process.Node
 import Network.Transport ( closeTransport )
 import Network.Transport.TCP
+import Test
 
 server :: DynamicT -> Process ()
 server st = do
