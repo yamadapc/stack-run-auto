@@ -1,7 +1,0 @@
-{
-  "author": "Pedro Tacla Yamada",
-  "license": "MIT",
-  "dependencies": {
-    "cheerio": "^0.19.0"
-  }
-}
