@@ -19,6 +19,11 @@ getPackage pkg revision = do
     uri = "http://hackage.haskell.org/package/" ++ pkg ++ "/revision/" ++
           show revision
 
+getPackageLatest :: String -> IO (ParseResult GenericPackageDescription)
+getPackageLatest pkg = do
+    revision <- getPackageLatestRevision pkg
+    getPackage pkg revision
+
 getPackageRevisions :: String -> IO [Integer]
 getPackageRevisions pkg = do
     res <- getWith opt uri
