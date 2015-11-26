@@ -26,7 +26,8 @@ run Options{..} = do
     modules <- fileModulesVerbose optsFileName
     packages <- mapConcurrently modulePackageVerbose modules
     allPackages <- mapConcurrently extractDependenciesVerbose (uniq packages)
-    let argList = map ("--package " ++) (uniq (packages ++ concat allPackages))
+    let argList = map ("--package " ++)
+                  (filter isValidPackage (uniq (packages ++ concat allPackages)))
         cmd = "stack runghc " ++ optsFileName ++ " " ++ join " " argList
     putStrLn cmd
     ph <- runCommand cmd
@@ -39,6 +40,10 @@ timed msg action = do
     end <- getCurrentTime
     putStrLn $ msg ++ " (" ++ show (diffUTCTime end start) ++ ")"
     return ret
+
+isValidPackage :: String -> Bool
+isValidPackage "rts" = False
+isValidPackage _ = True
 
 fileModulesVerbose :: String -> IO [String]
 fileModulesVerbose optsFileName = timed "---> Parsed imports" $ do
