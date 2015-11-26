@@ -1,29 +1,21 @@
 stack-run-auto
 ==============
-_There's work going on the `dev` branch to remove dependencies and make this
-more efficient. Editor integration should come soon enough._
-- - -
 Automatically finds dependencies and runs a Haskell script (no cabal manifest,
-no stack.yaml, no project). Currently a proof-of-concept using scripts.
-
-Implemented as a collection of bash scripts. Depends on:
-- `curl` (for making HTTP requests to the Hackage repository and the Hayoo
-  search-engine)
-- `stack` (for running scripts with `runghc` after installing resolved
-- `bash`
-  dependencies)
-- `grep` (needs GNU grep)
-- `jq` (for processing Hayoo responses)
-- `node` (for processing Hackage responses)
-- `tail`
-- `head`
-- `sort`
-- `uniq`
+no stack.yaml, no project).
 
 ## Installation
-Assuming you have all the binaries listed above, run `npm install` at the
-package root and symlink all these binaries onto your `$PATH`. Honestly this
-isn't ready for public use, I just want to expose how it's done.
+With stack:
+```
+stack install stack-run-auto
+```
+Manually:
+```
+git clone https://github.com/yamadapc/stack-run-auto
+cd stack-run-auto
+make
+```
+Then put `./dist` binaries you want on your PATH. `cd stack-run-auto && stack install`
+will do the same.
 
 ## Usage
 ```
@@ -39,81 +31,100 @@ This will:
   find the package matches
 - We need all packages that are needed to run the file to be specified, so we
   also need to query for the dependencies of each of the imported packages we
-  found in the last step. This is done with the `hackage-dependencies` script.
-  It hits the Hackage `/package/:packagename/dependencies` page, then passes the
-  page onto `extract-dependencies-simple`, which is a `node.js` script using
-  `cheerio` to parse simple dependencies out (it's not a `grep` because we don't
-  want optional dependencies, so we need the HTML structure - see the
-  [text page](http://hackage.haskell.org/package/text/dependencies) as an
-  example)
+  found in the last step. This is done with the `extract-dependencies` script.
 - Once we have all the dependencies, we pass them onto
   `stack runghc File.hs --package package1 --package package2 ...`
 
-## Example output
+## Example output on an Yesod project
 ```
-~ $ ./stack-run-auto DistributedProcess.hs
-$ file-modules DistributedProcess.hs
-----> Control.Concurrent
-----> Control.Distributed.Process
-----> Control.Distributed.Process.Node
-----> Network.Transport
-----> Network.Transport.TCP
-$ module-package Control.Concurrent
-----> base
-$ module-package Control.Distributed.Process
-----> distributed-process
-$ module-package Control.Distributed.Process.Node
-----> distributed-process
-$ module-package Network.Transport
-----> network-transport
-$ module-package Network.Transport.TCP
-----> network-transport-tcp
-$ hackage-dependencies distributed-process...
-----> distributed-process
-----> binary
-----> bytestring
-----> data-accessor
-----> distributed-static
-----> ghc-prim
-----> hashable
-----> mtl
-----> network-transport
-----> random
-----> rank1dynamic
-----> stm
-----> syb
-----> transformers
-$ hackage-dependencies network-transport...
-----> network-transport
-----> binary
-----> bytestring
-----> deepseq
-----> hashable
-----> transformers
-$ hackage-dependencies network-transport-tcp...
-----> network-transport-tcp
-----> bytestring
-----> containers
-----> data-accessor
-----> network
-----> network-transport
-$ stack runghc DistributedProcess.hs --package binary --package bytestring --package containers --package data-accessor --package deepseq --package distributed-process --package distributed-static --package ghc-prim --package hashable --package mtl --package network --package network-transport --package network-transport-tcp --package random --package rank1dynamic --package stm --package syb --package transformers
-# ... Stack runs
+~ $ ./stack-run-auto Application.hs
+Parsing Application.hs
+---> Parsed imports (0.009082s)
+Finding package for Yesod.Default.Config2...
+Finding package for Yesod.Core.Types...
+Finding package for Yesod.Static...
+Finding package for Yesod.Auth...
+Finding package for Yesod.Default.Util...
+Finding package for Network.Wai.Handler.Warp...
+Finding package for Language.Haskell.TH.Syntax...
+Finding package for Database.Persist.Postgresql...
+Finding package for Data.Yaml...
+Finding package for Data.FileEmbed...
+Finding package for Data.Aeson...
+Finding package for Control.Exception...
+Finding package for ClassyPrelude.Yesod...
+Finding package for Database.Persist.Quasi...
+Finding package for Yesod.Core.Unsafe...
+Finding package for Yesod.Auth.Message...
+Finding package for Yesod.Auth.Email...
+Finding package for Text.Jasmine...
+Finding package for Text.Hamlet...
+Finding package for Database.Persist.Sql...
+Finding package for System.Log.FastLogger...
+Finding package for Network.Wai.Middleware.RequestLogger...
+Finding package for Control.Monad.Logger...
+---> Found package for Network.Wai.Handler.Warp (3.596237s)
+---> Found package for Data.FileEmbed (3.613856s)
+---> Found package for Database.Persist.Postgresql (3.628068s)
+---> Found package for Database.Persist.Quasi (3.629282s)
+---> Found package for Yesod.Default.Util (3.630724s)
+---> Found package for Yesod.Core.Unsafe (3.633724s)
+---> Found package for Yesod.Core.Types (3.634s)
+---> Found package for Language.Haskell.TH.Syntax (3.640132s)
+---> Found package for Yesod.Default.Config2 (3.640586s)
+---> Found package for ClassyPrelude.Yesod (3.641378s)
+---> Found package for Yesod.Auth.Message (3.64284s)
+---> Found package for Yesod.Auth (3.646053s)
+---> Found package for Data.Yaml (3.653229s)
+---> Found package for Control.Monad.Logger (3.664165s)
+---> Found package for Network.Wai.Middleware.RequestLogger (3.664609s)
+---> Found package for Database.Persist.Sql (3.666917s)
+---> Found package for Text.Hamlet (3.672066s)
+---> Found package for Text.Jasmine (3.672255s)
+---> Found package for Yesod.Auth.Email (3.679442s)
+---> Found package for Data.Aeson (3.868004s)
+---> Found package for Control.Exception (3.869141s)
+---> Found package for Yesod.Static (3.909615s)
+---> Found package for System.Log.FastLogger (3.914372s)
+Finding dependencies for yesod...
+Finding dependencies for yesod-core...
+Finding dependencies for yesod-auth...
+Finding dependencies for yesod-static...
+Finding dependencies for warp...
+Finding dependencies for template-haskell...
+Finding dependencies for persistent-postgresql...
+Finding dependencies for yaml...
+Finding dependencies for file-embed...
+Finding dependencies for aeson...
+Finding dependencies for base...
+Finding dependencies for classy-prelude-yesod...
+Finding dependencies for persistent...
+Finding dependencies for hjsmin...
+Finding dependencies for shakespeare...
+Finding dependencies for fast-logger...
+Finding dependencies for wai-extra...
+Finding dependencies for monad-logger...
+---> Found dependencies for template-haskell (0.79311s)
+---> Found dependencies for yesod-static (0.797071s)
+---> Found dependencies for yesod (0.811596s)
+---> Found dependencies for yesod-auth (0.831798s)
+---> Found dependencies for file-embed (0.868215s)
+---> Found dependencies for yesod-core (0.87035s)
+---> Found dependencies for persistent-postgresql (0.892851s)
+---> Found dependencies for yaml (0.900229s)
+---> Found dependencies for classy-prelude-yesod (0.910601s)
+---> Found dependencies for warp (0.912838s)
+---> Found dependencies for shakespeare (0.917047s)
+---> Found dependencies for aeson (0.923956s)
+---> Found dependencies for fast-logger (0.928013s)
+---> Found dependencies for persistent (0.9371s)
+---> Found dependencies for monad-logger (0.93952s)
+---> Found dependencies for wai-extra (0.942007s)
+---> Found dependencies for hjsmin (0.942088s)
+---> Found dependencies for base (0.947236s)
+stack runghc Application.hs --package yesod --package yesod-core --package yesod-auth --package yesod-static --package warp --package template-haskell --package persistent-postgresql --package yaml --package file-embed --package aeson --package base --package classy-prelude-yesod --package persistent --package hjsmin --package shakespeare --package fast-logger --package wai-extra --package monad-logger --package yesod-persistent --package yesod-form --package monad-control --package transformers --package wai --package blaze-html --package blaze-markup --package safe --package data-default --package unordered-containers --package text --package directory --package bytestring --package conduit-extra --package streaming-commons --package wai-logger --package semigroups --package time --package path-pieces --package blaze-builder --package mtl --package clientsession --package random --package cereal --package old-locale --package containers --package transformers-base --package cookie --package http-types --package case-insensitive --package parsec --package vector --package conduit --package resourcet --package lifted-base --package unix-compat --package exceptions --package deepseq --package mwc-random --package primitive --package word8 --package auto-update --package byteable --package authenticate --package base16-bytestring --package cryptohash --package mime-mail --package persistent-template --package http-client --package http-conduit --package email-validate --package base64-bytestring --package binary --package nonce --package old-time --package wai-app-static --package cryptohash-conduit --package mime-types --package filepath --package process --package async --package attoparsec --package css-text --package hashable --package array --package bytestring-builder --package ghc-prim --package iproute --package http2 --package simple-sendfile --package vault --package stm --package pretty --package postgresql-simple --package postgresql-libpq --package scientific --package enclosed-exceptions --package dlist --package syb --package classy-prelude --package classy-prelude-conduit --package yesod-newsfeed --package resource-pool --package http-api-data --package silently --package tagged --package language-javascript --package network --package data-default-class --package ansi-terminal --package void --package stringsearch --package zlib --package transformers-compat --package stm-chans --package monad-loops
+# Stack runs...
 ```
-
-- - -
-
-It'd be nice to have this polished. A couple of things:
-- The Hayoo API is super useful. Editor plugins could really benefit from
-  automatically resolving the package name from a module name. You can drop-in
-  `module-package` onto an Elisp script for example and have it automatically
-  add dependencies for you.
-- The Hackage dependencies bit is the worst part. There should be an easier way
-  to do this (a better API, a command-line tool or something like that). I'd
-  rather not have `extract-dependencies-simple`, since that introduces the
-  Node.js dependency, which is ugly.
-- `file-modules` is useful, but fragile. I'm sure someone has an actual parser
-  that can do it perfectly. I choose the quick-and-dirty route.
 
 ## License
 This code is licensed under the MIT license. For more information please refer

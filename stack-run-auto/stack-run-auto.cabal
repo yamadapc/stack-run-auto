@@ -29,6 +29,25 @@ library
                      , file-modules
   default-language:    Haskell2010
 
+executable module-package
+  hs-source-dirs:      app
+  main-is:             ModulePackage.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , time
+                     , process
+                     , text
+                     , lens-aeson
+                     , lens
+                     , wreq
+                     , MissingH
+                     , stm-containers
+                     , async
+                     , extract-dependencies
+                     , file-modules
+                     , stack-run-auto
+  default-language:    Haskell2010
+
 executable stack-run-auto
   hs-source-dirs:      app
   main-is:             Main.hs
