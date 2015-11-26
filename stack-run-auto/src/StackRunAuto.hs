@@ -15,7 +15,6 @@ import           Development.ExtractDependencies
 import           Development.FileModules
 import           Network.Wreq                    (defaults, getWith, param,
                                                   responseBody)
-import qualified STMContainers.Set               as Set
 import           System.Exit
 import           System.Process
 
@@ -44,8 +43,7 @@ timed msg action = do
 fileModulesVerbose :: String -> IO [String]
 fileModulesVerbose optsFileName = timed "---> Parsed imports" $ do
     putStrLn $ "Parsing " ++ optsFileName
-    filesSeen <- Set.newIO
-    uniq <$> fileModulesRecur filesSeen optsFileName
+    uniq <$> fileModulesRecur optsFileName
 
 extractDependenciesVerbose :: String -> IO [String]
 extractDependenciesVerbose pkg = timed ("---> Found dependencies for " ++ pkg) $ do
