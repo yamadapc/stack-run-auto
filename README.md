@@ -8,7 +8,7 @@ With stack:
 ```
 stack install stack-run-auto
 ```
-Manually:
+Manually *(recommended)*:
 ```
 git clone https://github.com/yamadapc/stack-run-auto
 cd stack-run-auto
