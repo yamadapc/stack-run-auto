@@ -1,5 +1,5 @@
 name:                package-description-remote
-version:             0.1.1.0
+version:             0.2.0.0
 synopsis:            Fetches a 'GenericPackageDescription' from Hackage
 description:         Please see README.md
 homepage:            http://github.com/yamadapc/stack-run-auto/package-description-remote
