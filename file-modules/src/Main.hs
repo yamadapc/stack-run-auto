@@ -11,7 +11,7 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
-      "--version":_ -> putStrLn "0.1.1.0"
+      "--version":_ -> putStrLn "0.1.2.0"
       "--help":_ -> printUsage
       [] -> printUsage >> exitFailure
       ms -> do
