@@ -7,8 +7,10 @@ license-file: LICENSE
 copyright: Copyright (c) Pedro Tacla Yamada 2015
 maintainer: tacla.yamada@gmail.com
 homepage: https://github.com/yamadapc/stack-run-auto
-synopsis: Takes a Haskell source-code file and outputs the modules it
-          . imports. Follows links to local modules as well.
+synopsis: Takes a Haskell source-code file and outputs its modules.
+description:
+    Uses @haskell-src-exts@ to parse module imports and follows links
+    . to local modules in order to build a list of module dependencies.
 category: Development
 author: Pedro Tacla Yamada
 
