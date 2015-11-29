@@ -1,5 +1,5 @@
 name: file-modules
-version: 0.1.2.1
+version: 0.1.2.2
 cabal-version: >=1.10
 build-type: Simple
 license: MIT
