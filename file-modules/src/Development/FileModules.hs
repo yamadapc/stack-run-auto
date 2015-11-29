@@ -28,7 +28,7 @@ fileModulesRecur fname = run fname
 
 fileModules :: FilePath -> IO [String]
 fileModules fname = do
-    result <- parse <$> readFile fname
+    result <- parse . sanitize <$> readFile fname
     case result of
         (ParseOk (NonGreedy{..})) -> do
             let (ModuleHeadAndImports _ _ mimports) = unNonGreedy
@@ -36,3 +36,7 @@ fileModules fname = do
                 let ModuleName iname = importModule imp
                 in return iname
         (ParseFailed _ _) -> error $ "Failed to parse module in " ++ fname
+  where
+    sanitize = unlines . map removeCpp . lines
+    removeCpp ('#':_) = ""
+    removeCpp l = l
