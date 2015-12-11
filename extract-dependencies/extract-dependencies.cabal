@@ -1,5 +1,5 @@
 name:                extract-dependencies
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Given a hackage package outputs the list of its dependencies.
 homepage:            https://github.com/yamadapc/stack-run-auto/extract-dependencies
 license:             MIT
