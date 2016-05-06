@@ -17,6 +17,7 @@ import           Network.Wreq                    (defaults, getWith, param,
                                                   responseBody)
 import           System.Exit
 import           System.Process
+import           System.IO (hPutStrLn, stderr)
 
 data Options = Options { optsFileName :: FilePath
                        }
@@ -68,7 +69,13 @@ modulePackage m = do
     let result = res ^.. responseBody . key "result" . values
         moduleResults = filter isModuleResult result
     case moduleResults of
-        [] -> error $ "No package found for " ++ m
+        [] -> do
+            let errMsg = "No package found for " ++ m
+            hPutStrLn stderr errMsg
+            let mparts = split "." m
+            if not (null mparts)
+                then modulePackageVerbose (join "." (init mparts))
+                else error $ "Couldn't resolve package for " ++ m
         (p:_) -> do
             let pkg = Text.unpack (p ^. key "resultPackage" . _String)
             return pkg
