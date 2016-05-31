@@ -1,7 +1,8 @@
 name:                extract-dependencies
-version:             0.2.0.0
+version:             0.2.0.1
 synopsis:            Given a hackage package outputs the list of its dependencies.
-homepage:            https://github.com/yamadapc/stack-run-auto/extract-dependencies
+description:         Given a hackage package outputs the list of its dependencies. See our GitHub README. This is part of stack-run-auto.
+homepage:            https://github.com/yamadapc/stack-run-auto
 license:             MIT
 license-file:        LICENSE
 author:              André Barnabá
@@ -26,7 +27,6 @@ executable extract-dependencies
 library
   hs-source-dirs:      src
   exposed-modules:     Development.ExtractDependencies
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base >= 4.8 && < 5
                      , async
                      , containers
