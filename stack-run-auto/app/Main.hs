@@ -15,9 +15,9 @@ main = do
     case args' of
         [] -> error "Usage: stack-run-auto <file>"
         ("--help":_) -> hPutStrLn stderr usage
-        (fname:_) -> run (Options fname extras)
+        (fname:flags) -> run (Options fname extras flags)
   where
-    usage = unlines [ "Usage: stack-run-auto [--extra <pkg>...] <file>"
+    usage = unlines [ "Usage: stack-run-auto [--extra <pkg>...] <file> [<stack-flag>...]"
                     , ""
                     , "    --extra <pkg>   Adds an extra package that couldn't be resolved"
                     , ""

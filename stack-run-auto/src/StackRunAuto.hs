@@ -21,6 +21,7 @@ import           System.Process
 
 data Options = Options { optsFileName :: FilePath
                        , optsExtras   :: [String]
+                       , optsFlags    :: [String]
                        }
 
 run :: Options -> IO ()
@@ -31,7 +32,11 @@ run Options{..} = do
     let argList = map ("--package " ++)
                   (filter isValidPackage
                    (uniq (packages ++ concat allPackages ++ optsExtras)))
-        cmd = "stack runghc " ++ optsFileName ++ " " ++ join " " argList
+        cmd = unwords [ "stack runghc "
+                      , unwords optsFlags
+                      , optsFileName
+                      , unwords argList
+                      ]
     putStrLn cmd
     ph <- runCommand cmd
     waitForProcess ph >>= exitWith
