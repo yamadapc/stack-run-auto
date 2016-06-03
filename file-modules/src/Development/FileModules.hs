@@ -10,6 +10,7 @@ import           Language.Haskell.Exts    (ImportDecl (..),
                                            ParseResult (..), SrcLoc (..), parse)
 import           System.Directory
 import           System.FilePath
+import           Text.Regex
 
 fileModulesRecur :: FilePath -> IO [String]
 fileModulesRecur fname = run fname
@@ -40,9 +41,14 @@ fileModules fname = do
             "  (" ++ show line ++ ":" ++ show col ++ ") " ++ err ++ "\n" ++
             "  " ++ getLineCol fcontents (line, col)
   where
-    sanitize = unlines . map removeCpp . lines
+    sanitize =
+        unlines . map (removeMagicHash . removeCpp) . lines
     removeCpp ('#':_) = ""
     removeCpp l = l
+    removeMagicHash l = subRegex r l o
+      where
+        r = mkRegex "#"
+        o = ""
     getLineCol fcontents (line, col) =
         ln ++ "\n" ++
         "  " ++ replicate (col' - 3) ' ' ++ "^^^"
@@ -50,4 +56,3 @@ fileModules fname = do
         ln = lines fcontents !! line
         col' = let l = length ln
                in if col > l then l else col
-
