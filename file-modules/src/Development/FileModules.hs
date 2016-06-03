@@ -7,7 +7,7 @@ import           Data.String.Utils        (split)
 import           Language.Haskell.Exts    (ImportDecl (..),
                                            ModuleHeadAndImports (..),
                                            ModuleName (..), NonGreedy (..),
-                                           ParseResult (..), parse)
+                                           ParseResult (..), SrcLoc (..), parse)
 import           System.Directory
 import           System.FilePath
 
@@ -28,15 +28,26 @@ fileModulesRecur fname = run fname
 
 fileModules :: FilePath -> IO [String]
 fileModules fname = do
-    result <- parse . sanitize <$> readFile fname
-    case result of
-        (ParseOk (NonGreedy{..})) -> do
+    fcontents <- readFile fname
+    case parse $ sanitize fcontents  of
+        (ParseOk NonGreedy{..}) -> do
             let (ModuleHeadAndImports _ _ mimports) = unNonGreedy
             forM mimports $ \imp ->
                 let ModuleName iname = importModule imp
                 in return iname
-        (ParseFailed _ _) -> error $ "Failed to parse module in " ++ fname
+        (ParseFailed (SrcLoc _ line col) err) -> error $
+            "Failed to parse module in " ++ fname ++ ":\n" ++
+            "  (" ++ show line ++ ":" ++ show col ++ ") " ++ err ++ "\n" ++
+            "  " ++ getLineCol fcontents (line, col)
   where
     sanitize = unlines . map removeCpp . lines
     removeCpp ('#':_) = ""
     removeCpp l = l
+    getLineCol fcontents (line, col) =
+        ln ++ "\n" ++
+        "  " ++ replicate (col' - 3) ' ' ++ "^^^"
+      where
+        ln = lines fcontents !! line
+        col' = let l = length ln
+               in if col > l then l else col
+
