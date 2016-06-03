@@ -8,14 +8,13 @@ With stack:
 ```
 stack install stack-run-auto
 ```
+
 Manually *(recommended)*:
 ```
 git clone https://github.com/yamadapc/stack-run-auto
-cd stack-run-auto
-make
+cd stack-run-auto/stack-run-auto
+stack install
 ```
-Then put `./dist` binaries you want on your PATH. `cd stack-run-auto && stack install`
-will do the same.
 
 ## Usage
 ```
@@ -23,17 +22,12 @@ stack-run-auto Test.hs
 ```
 
 This will:
-- Run the `file-modules` script on the input file. This prints the imported
-  modules from this Haskell file.
-- Use the `module-package` script to find the package containing each of these
-  modules. This uses the Hayoo search-engine to query for the module trying to
-  find from which package it came from. `jq` post-processes the JSON output to
-  find the package matches
-- We need all packages that are needed to run the file to be specified, so we
-  also need to query for the dependencies of each of the imported packages we
-  found in the last step. This is done with the `extract-dependencies` script.
-- Once we have all the dependencies, we pass them onto
-  `stack runghc File.hs --package package1 --package package2 ...`
+- Find the imported modules from this Haskell file and it's local dependencies
+- Find the package containing each of these modules using the Hayoo
+  search-engine to query for the module trying to find from which package it
+  came from
+- Find dependencies for all the packages resolved
+- Run `stack runghc File.hs --package package1 --package package2 ...`
 
 ## Example output on an Yesod project
 ```
