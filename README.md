@@ -27,6 +27,7 @@ This will:
   search-engine to query for the module trying to find from which package it
   came from
 - Find dependencies for all the packages resolved
+- Cache this on `$HOME/.stack-run-auto`
 - Run `stack runghc File.hs --package package1 --package package2 ...`
 
 ## Example output on an Yesod project
