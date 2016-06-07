@@ -76,10 +76,10 @@ modulePackageVerbose m = timed ("---> Found package for " ++ m) $ do
     putStrLn $ "Finding package for " ++ m ++ "..."
     modulePackageCached m
 
-cached :: (Read b, Show b) => t -> (FilePath -> IO b) -> FilePath -> IO b
+cached :: (Read b, Show b) => String -> (FilePath -> IO b) -> FilePath -> IO b
 cached name fn arg = do
     home <- getHomeDirectory
-    let cacheDir = home </> ".stack-run-auto" </> "module-packages"
+    let cacheDir = home </> ".stack-run-auto" </> name
         cachePth = cacheDir </> arg
     createDirectoryIfMissing True cacheDir
     exists <- doesFileExist cachePth
