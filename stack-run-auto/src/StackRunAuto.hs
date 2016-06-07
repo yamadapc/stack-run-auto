@@ -35,9 +35,9 @@ run Options{..} = do
                   (filter isValidPackage
                    (uniq (packages ++ concat allPackages ++ optsExtras)))
         cmd = unwords [ "stack runghc "
-                      , unwords optsFlags
                       , optsFileName
                       , unwords argList
+                      , unwords optsFlags
                       ]
     putStrLn cmd
     ph <- runCommand cmd
