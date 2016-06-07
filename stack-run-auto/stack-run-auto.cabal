@@ -16,6 +16,8 @@ library
   hs-source-dirs:      src
   exposed-modules:     StackRunAuto
   build-depends:       base >= 4.7 && < 5
+                     , filepath
+                     , directory
                      , time
                      , process
                      , text
@@ -34,6 +36,8 @@ executable module-package
   main-is:             ModulePackage.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
+                     , filepath
+                     , directory
                      , time
                      , process
                      , text
@@ -53,6 +57,8 @@ executable stack-run-auto
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
+                     , filepath
+                     , directory
                      , time
                      , process
                      , text
@@ -72,6 +78,8 @@ test-suite stack-run-auto-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
+                     , filepath
+                     , directory
                      , time
                      , process
                      , text

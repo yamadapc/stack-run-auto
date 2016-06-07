@@ -15,7 +15,9 @@ import           Development.ExtractDependencies
 import           Development.FileModules
 import           Network.Wreq                    (defaults, getWith, param,
                                                   responseBody)
+import           System.Directory
 import           System.Exit
+import           System.FilePath
 import           System.IO                       (hPutStrLn, stderr)
 import           System.Process
 
@@ -61,7 +63,10 @@ fileModulesVerbose optsFileName = timed "---> Parsed imports" $ do
 extractDependenciesVerbose :: String -> IO [String]
 extractDependenciesVerbose pkg = timed ("---> Found dependencies for " ++ pkg) $ do
     putStrLn $ "Finding dependencies for " ++ pkg ++ "..."
-    extractDependencies pkg
+    extractDependenciesCached pkg
+
+extractDependenciesCached :: String -> IO [String]
+extractDependenciesCached = cached "extract-dependencies" extractDependencies
 
 modulePackageVerbose :: String -> IO (Maybe String)
 modulePackageVerbose "" = do
@@ -69,7 +74,23 @@ modulePackageVerbose "" = do
     return Nothing
 modulePackageVerbose m = timed ("---> Found package for " ++ m) $ do
     putStrLn $ "Finding package for " ++ m ++ "..."
-    modulePackage m
+    modulePackageCached m
+
+cached name fn arg = do
+    home <- getHomeDirectory
+    let cacheDir = home </> ".stack-run-auto" </> "module-packages"
+        cachePth = cacheDir </> arg
+    createDirectoryIfMissing True cacheDir
+    exists <- doesFileExist cachePth
+    if exists
+        then read <$> readFile cachePth
+        else do
+            r <- fn arg
+            writeFile cachePth (show r)
+            return r
+
+modulePackageCached :: String -> IO (Maybe String)
+modulePackageCached = cached "module-package" modulePackage
 
 modulePackage :: String -> IO (Maybe String)
 modulePackage m = do
