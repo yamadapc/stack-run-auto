@@ -11,5 +11,6 @@ main :: IO ()
 main = do
     args <- getArgs
     hSetBuffering stdout LineBuffering
+    hSetBuffering stderr LineBuffering
     pkgs <- mapConcurrently modulePackage args
     forM_ (catMaybes pkgs) putStrLn

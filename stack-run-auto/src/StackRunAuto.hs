@@ -48,7 +48,7 @@ timed msg action = do
     start <- getCurrentTime
     ret <- action
     end <- getCurrentTime
-    putStrLn $ msg ++ " (" ++ show (diffUTCTime end start) ++ ")"
+    hPutStrLn stderr $ msg ++ " (" ++ show (diffUTCTime end start) ++ ")"
     return ret
 
 isValidPackage :: String -> Bool
@@ -57,12 +57,12 @@ isValidPackage _ = True
 
 fileModulesVerbose :: String -> IO [String]
 fileModulesVerbose optsFileName = timed "---> Parsed imports" $ do
-    putStrLn $ "Parsing " ++ optsFileName
+    hPutStrLn stderr $ "Parsing " ++ optsFileName
     uniq <$> fileModulesRecur optsFileName
 
 extractDependenciesVerbose :: String -> IO [String]
 extractDependenciesVerbose pkg = timed ("---> Found dependencies for " ++ pkg) $ do
-    putStrLn $ "Finding dependencies for " ++ pkg ++ "..."
+    hPutStrLn stderr $ "Finding dependencies for " ++ pkg ++ "..."
     extractDependenciesCached pkg
 
 extractDependenciesCached :: String -> IO [String]
@@ -70,10 +70,10 @@ extractDependenciesCached = cached "extract-dependencies" extractDependencies
 
 modulePackageVerbose :: String -> IO (Maybe String)
 modulePackageVerbose "" = do
-    putStrLn "Skipping parse error (empty string)..."
+    hPutStrLn stderr "Skipping parse error (empty string)..."
     return Nothing
 modulePackageVerbose m = timed ("---> Found package for " ++ m) $ do
-    putStrLn $ "Finding package for " ++ m ++ "..."
+    hPutStrLn stderr $ "Finding package for " ++ m ++ "..."
     modulePackageCached m
 
 cached :: (Read b, Show b) => String -> (FilePath -> IO b) -> FilePath -> IO b
