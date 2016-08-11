@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP             #-}
 {-# LANGUAGE RecordWildCards #-}
 module Development.FileModules where
 
@@ -7,7 +8,15 @@ import           Data.String.Utils        (split)
 import           Language.Haskell.Exts    (ImportDecl (..),
                                            ModuleHeadAndImports (..),
                                            ModuleName (..), NonGreedy (..),
-                                           ParseResult (..), SrcLoc (..), parse)
+                                           ParseResult (..),
+#ifdef MIN_TOOL_VERSION_hs_src_exts
+#  if MIN_TOOL_VERSION_hs_src_exts(1,18,0)
+                                           SrcSpanInfo,
+#  endif
+#else
+                                           SrcSpanInfo,
+#endif
+                                           SrcLoc (..), parse)
 import           System.Directory
 import           System.FilePath
 import           Text.Regex
@@ -27,15 +36,34 @@ fileModulesRecur fname = run fname
               else return [m]
       return (concat modules')
 
+#ifdef MIN_TOOL_VERSION_hs_src_exts
+#  if MIN_TOOL_VERSION_hs_src_exts(1,18,0)
+getImportsFromHead :: NonGreedy (ModuleHeadAndImports SrcSpanInfo) -> [String]
+getImportsFromHead (NonGreedy (ModuleHeadAndImports _ _ _ mimports)) =
+    map (helper . importModule) mimports
+  where
+    helper (ModuleName _ iname) = iname
+#  else
+{-# DEPRECATED getImportsFromHead "hs-src-exts<1.18.0 will stoped being supported in file-modules" #-}
+getImportsFromHead (NonGreedy{..}) =
+    map (helper . importModule) mimports
+  where
+    helper (ModuleName iname) = iname
+#  endif
+#else
+{-# WARNING getImportsFromHead "Cabal macro to detect hs-src-exts version not defined, assuming hs-src-exts>1.18.0" #-}
+getImportsFromHead :: NonGreedy (ModuleHeadAndImports SrcSpanInfo) -> [String]
+getImportsFromHead (NonGreedy (ModuleHeadAndImports _ _ _ mimports)) =
+    map (helper . importModule) mimports
+  where
+    helper (ModuleName _ iname) = iname
+#endif
+
 fileModules :: FilePath -> IO [String]
 fileModules fname = do
     fcontents <- readFile fname
-    case parse $ sanitize fcontents  of
-        (ParseOk NonGreedy{..}) -> do
-            let (ModuleHeadAndImports _ _ mimports) = unNonGreedy
-            forM mimports $ \imp ->
-                let ModuleName iname = importModule imp
-                in return iname
+    case parse $ sanitize fcontents of
+        (ParseOk rheadAndImports) -> return (getImportsFromHead rheadAndImports)
         (ParseFailed (SrcLoc _ line col) err) -> error $
             "Failed to parse module in " ++ fname ++ ":\n" ++
             "  (" ++ show line ++ ":" ++ show col ++ ") " ++ err ++ "\n" ++
