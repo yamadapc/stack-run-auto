@@ -9,8 +9,8 @@ import           Language.Haskell.Exts    (ImportDecl (..),
                                            ModuleHeadAndImports (..),
                                            ModuleName (..), NonGreedy (..),
                                            ParseResult (..),
-#ifdef MIN_TOOL_VERSION_hs_src_exts
-#  if MIN_TOOL_VERSION_hs_src_exts(1,18,0)
+#ifdef MIN_VERSION_haskell_src_exts
+#  if MIN_VERSION_haskell_src_exts(1,18,0)
                                            SrcSpanInfo,
 #  endif
 #else
@@ -36,22 +36,23 @@ fileModulesRecur fname = run fname
               else return [m]
       return (concat modules')
 
-#ifdef MIN_TOOL_VERSION_hs_src_exts
-#  if MIN_TOOL_VERSION_hs_src_exts(1,18,0)
+#ifdef MIN_VERSION_haskell_src_exts
+#  if MIN_VERSION_haskell_src_exts(1,18,0)
 getImportsFromHead :: NonGreedy (ModuleHeadAndImports SrcSpanInfo) -> [String]
 getImportsFromHead (NonGreedy (ModuleHeadAndImports _ _ _ mimports)) =
     map (helper . importModule) mimports
   where
     helper (ModuleName _ iname) = iname
 #  else
-{-# DEPRECATED getImportsFromHead "hs-src-exts<1.18.0 will stoped being supported in file-modules" #-}
+{-# DEPRECATED getImportsFromHead "haskell-src-exts<1.18.0 will stoped being supported in file-modules" #-}
 getImportsFromHead (NonGreedy{..}) =
     map (helper . importModule) mimports
   where
+    (ModuleHeadAndImports _ _ mimports) = unNonGreedy
     helper (ModuleName iname) = iname
 #  endif
 #else
-{-# WARNING getImportsFromHead "Cabal macro to detect hs-src-exts version not defined, assuming hs-src-exts>1.18.0" #-}
+{-# WARNING getImportsFromHead "Cabal macro to detect haskell-src-exts version not defined, assuming haskell-src-exts>1.18.0" #-}
 getImportsFromHead :: NonGreedy (ModuleHeadAndImports SrcSpanInfo) -> [String]
 getImportsFromHead (NonGreedy (ModuleHeadAndImports _ _ _ mimports)) =
     map (helper . importModule) mimports
